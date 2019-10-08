@@ -1,0 +1,6 @@
+tests:
+
+- name: get bc
+  GET: https://burningchrome.com
+  response_html:
+      h1: Chris Dent Stuff
