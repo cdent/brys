@@ -1,7 +1,8 @@
 
-brys:
-: Cornish for intention, mind, opinion, thought, psyche
-: Welsh for speed, haste, urgency
+*brys*:
+
+* Cornish for intention, mind, opinion, thought, psyche
+* Welsh for speed, haste, urgency
 
 This is a place to work out the creation of a wiki in golang that
 meets two critical requirements:
