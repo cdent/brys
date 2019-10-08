@@ -1,0 +1,10 @@
+# Simple wiki journey in gabbi yaml
+
+
+tests:
+
+- name: get empty page
+  GET: /p/CleanPlate
+  response_html:
+      h1: CleanPlate
+      form@id: editor

@@ -6,6 +6,7 @@ help:
 	@echo "cleangabbi: remove gabbit virt env"
 
 gabbi: brys
+	rm .brys.pid || true
 	brys & echo "$$!" > .brys.pid
 	[ -d .gabbi ] || python3 -mvenv .gabbi
 	[ -x .gabbi/bin/gabbi-run ] || .gabbi/bin/pip install gabbi git+https://github.com/cdent/gabbihtml.git#egg=gabbihtml
@@ -19,5 +20,5 @@ cleangabbi:
 
 brys: ${GOBIN}/brys
 
-${GOBIN}/brys:
+${GOBIN}/brys: main.go
 	go install
