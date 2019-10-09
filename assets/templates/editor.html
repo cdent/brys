@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{{.PageId}}</title>
+	</head>
+	<body>
+        <h1>{{.PageId}}</h1>
+        <form id="editor" action="/p/{{.PageId}}" method="POST">
+            <textarea name="content" rows="24" cols="80" placeholder="Enter text for {{.PageId}}"></textarea>
+            <hr/>
+            <button accesskey="s" type="submit">Save</button>
+            <button type="reset">Revert</button>
+        </form>
+	</body>
+</html>

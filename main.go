@@ -2,11 +2,22 @@ package main
 
 import (
 	"fmt"
+	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/gobuffalo/packr/v2"
 )
+
+var box = packr.New("assets", "./assets")
+
+func check(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("<html><body><h1>Hello World</h1></body></html>"))
@@ -21,10 +32,24 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
 	_, err := readPage(pageId)
 	if err != nil {
-		w.Write([]byte(fmt.Sprintf("<html><body><h1>%s</h1><form id=\"editor\"></form></body></html>", pageId)))
+		s, err := box.FindString("templates/editor.html")
+		check(err)
+		t, err := template.New("editor").Parse(s)
+		check(err)
+		data := struct {
+			PageId string
+		}{
+			pageId,
+		}
+		t.Execute(w, data)
 	} else {
 		w.Write([]byte("<html><body><h1>something</h1></body></html>"))
 	}
+}
+
+func setPage(w http.ResponseWriter, r *http.Request) {
+	pageId := chi.URLParam(r, "pageId")
+	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), 303)
 }
 
 func main() {
@@ -34,6 +59,7 @@ func main() {
 
 	r.Route("/p", func(r chi.Router) {
 		r.Get("/{pageId}", getPage)
+		r.Post("/{pageId}", setPage)
 	})
 	r.Get("/", getRoot)
 

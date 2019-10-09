@@ -8,3 +8,13 @@ tests:
   response_html:
       h1: CleanPlate
       form@id: editor
+
+- name: write page
+  POST: /p/CleanPlate
+  request_headers:
+      content-type: application/x-www-form-urlencoded
+  data:
+      content: This is MyContent
+  status: 303
+  response_headers:
+      location: /p/CleanPlate
