@@ -1,5 +1,5 @@
 
-.PHONY: help gabbi cleangabbi
+.PHONY: help gabbi cleangabbi deps
 
 help:
 	@echo "gabbi: run the gabbi tests"
@@ -19,7 +19,10 @@ gabbi: brys
 cleangabbi:
 	rm -rf .gabbi
 
-brys: ${GOBIN}/brys
+deps:
+	go get ./...
+
+brys: deps ${GOBIN}/brys
 
 ${GOBIN}/brys: main.go
 	go install
