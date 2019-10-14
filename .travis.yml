@@ -1,2 +1,4 @@
 language: go
+before_install:
+- sudo apt-get install python3-venv
 script: make gabbi
