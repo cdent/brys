@@ -8,6 +8,7 @@ tests:
   response_html:
       h1: CleanPlate
       form@id: editor
+      title: CleanPlate
 
 - name: write page
   POST: /p/CleanPlate

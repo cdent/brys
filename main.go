@@ -32,16 +32,20 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
 	_, err := readPage(pageId)
 	if err != nil {
-		s, err := box.FindString("templates/editor.html")
+		b, err := box.FindString("templates/base.html")
 		check(err)
-		t, err := template.New("editor").Parse(s)
+		e, err := box.FindString("templates/editor.html")
+		check(err)
+		bt, err := template.New("editor").Parse(b)
+		check(err)
+		et, err := bt.Parse(e)
 		check(err)
 		data := struct {
 			PageId string
 		}{
 			pageId,
 		}
-		t.Execute(w, data)
+		et.Execute(w, data)
 	} else {
 		w.Write([]byte("<html><body><h1>something</h1></body></html>"))
 	}
