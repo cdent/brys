@@ -19,3 +19,9 @@ tests:
   status: 303
   response_headers:
       location: /p/CleanPlate
+
+- name: get page
+  GET: $LOCATION
+  response_html:
+      h1: CleanPlate
+      pre: This is MyContent

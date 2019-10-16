@@ -6,6 +6,8 @@ help:
 	@echo "cleangabbi: remove gabbit virt env"
 
 gabbi: brys
+	rm -r store || true
+	mkdir store
 	[ -e .brys.pid ] && kill -TERM $$(cat .brys.pid) || true
 	rm .brys.pid || true
 	brys & echo "$$!" > .brys.pid

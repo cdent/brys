@@ -3,14 +3,17 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/gobuffalo/packr/v2"
 )
 
+var store = "./store"
 var box = packr.New("assets", "./assets")
 
 func check(err error) {
@@ -24,13 +27,16 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func readPage(p string) (string, error) {
-	// pretend there are no pages, for now
-	return "", fmt.Errorf("not found %s", p)
+	content, err := ioutil.ReadFile(store + "/" + p)
+	if err != nil {
+		return "", fmt.Errorf("not found %s", p)
+	}
+	return string(content), nil
 }
 
 func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
-	_, err := readPage(pageId)
+	content, err := readPage(pageId)
 	if err != nil {
 		b, err := box.FindString("templates/base.html")
 		check(err)
@@ -47,12 +53,34 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 		}
 		et.Execute(w, data)
 	} else {
-		w.Write([]byte("<html><body><h1>something</h1></body></html>"))
+		b, err := box.FindString("templates/base.html")
+		check(err)
+		e, err := box.FindString("templates/page.html")
+		check(err)
+		bt, err := template.New("page").Parse(b)
+		check(err)
+		et, err := bt.Parse(e)
+		check(err)
+		data := struct {
+			PageId  string
+			Content string
+		}{
+			pageId,
+			content,
+		}
+		et.Execute(w, data)
 	}
 }
 
 func setPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
+	content := r.PostFormValue("content")
+	f, err := os.Create(store + "/" + pageId)
+	check(err)
+	defer f.Close()
+	_, err = f.WriteString(content)
+	check(err)
+	f.Sync()
 	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), 303)
 }
 
