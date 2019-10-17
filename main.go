@@ -63,10 +63,11 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 		check(err)
 		data := struct {
 			PageId  string
-			Content string
+			Content template.HTML
 		}{
 			pageId,
-			content,
+			// FIXME: This allows anything HTML in the wikification to pass through
+			template.HTML(wikify(content)),
 		}
 		et.Execute(w, data)
 	}
