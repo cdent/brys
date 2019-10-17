@@ -13,6 +13,7 @@ import (
 	"github.com/gobuffalo/packr/v2"
 )
 
+var homePage = "HomePage"
 var store = "./store"
 var box = packr.New("assets", "./assets")
 
@@ -23,7 +24,7 @@ func check(err error) {
 }
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("<html><body><h1>Hello World</h1></body></html>"))
+	http.Redirect(w, r, fmt.Sprintf("/p/%s", homePage), 302)
 }
 
 func readPage(p string) (string, error) {
@@ -36,8 +37,9 @@ func readPage(p string) (string, error) {
 
 func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
+	edit := r.FormValue("edit")
 	content, err := readPage(pageId)
-	if err != nil {
+	if err != nil || edit == "edit" {
 		b, err := box.FindString("templates/base.html")
 		check(err)
 		e, err := box.FindString("templates/editor.html")
@@ -47,9 +49,11 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 		et, err := bt.Parse(e)
 		check(err)
 		data := struct {
-			PageId string
+			PageId  string
+			Content string
 		}{
 			pageId,
+			content,
 		}
 		et.Execute(w, data)
 	} else {

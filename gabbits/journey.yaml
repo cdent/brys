@@ -23,10 +23,19 @@ tests:
 - name: get page
   GET: $LOCATION
   response_html:
-      h1: CleanPlate
+      h1 > a: CleanPlate
+      h1 > a@href: /p/CleanPlate?edit=edit
       pre: This is
       pre > a: MyContent
       pre > a@href: /p/MyContent
       pre > a@class: wikiword
   response_strings:
       - <a class="wikiword" href="/p/MyContent">MyContent</a>
+
+- name: get existing page edit
+  GET: $RESPONSE['h1 > a@href']
+  response_html:
+      h1: CleanPlate
+      form@id: editor
+      title: CleanPlate
+      textarea: This is MyContent

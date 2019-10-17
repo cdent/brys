@@ -2,5 +2,6 @@ tests:
 
 - name: confirm server
   GET: /
-  response_html:
-      h1: Hello World
+  status: 302
+  response_headers:
+      location: /p/HomePage
