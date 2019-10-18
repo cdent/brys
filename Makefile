@@ -19,9 +19,8 @@ gabbi: brys
 
 test: gotest gabbi
 
-gotest:
+gotest: deps
 	go test
-
 
 cleangabbi:
 	rm -rf .gabbi
