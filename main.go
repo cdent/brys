@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -19,11 +17,6 @@ var (
 	box      = packr.New("assets", "./assets")
 )
 
-type Page struct {
-	PageId  string
-	Content string
-}
-
 // FIXME: this should result in http errors, not fatal exits
 func check(err error) {
 	if err != nil {
@@ -34,16 +27,6 @@ func check(err error) {
 // Go to the HomePage when / is requested.
 func getRoot(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/p/%s", homePage), http.StatusFound)
-}
-
-func readPage(p string) (*Page, error) {
-	content, err := ioutil.ReadFile(store + "/" + p)
-	if err != nil {
-		// FIXME: if the err is not found we should return here. If it is
-		// something weird, we should do something about that...
-		return nil, err
-	}
-	return &Page{PageId: p, Content: string(content)}, nil
 }
 
 func sendEditor(w http.ResponseWriter, page *Page) {
@@ -81,7 +64,7 @@ func sendWikiPage(w http.ResponseWriter, page *Page) {
 func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
 	edit := r.FormValue("edit")
-	page, _ := readPage(pageId)
+	page, _ := readPage(store, pageId)
 	if page == nil {
 		page = &Page{PageId: pageId, Content: ""}
 		edit = "edit"
@@ -93,24 +76,11 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (p *Page) save() error {
-	f, err := os.Create(store + "/" + p.PageId)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = f.WriteString(p.Content)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func setPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
 	content := r.PostFormValue("content")
 	page := &Page{PageId: pageId, Content: content}
-	err := page.save()
+	err := page.save(store)
 	check(err)
 	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
 }
