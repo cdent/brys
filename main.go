@@ -24,7 +24,7 @@ func check(err error) {
 }
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, fmt.Sprintf("/p/%s", homePage), 302)
+	http.Redirect(w, r, fmt.Sprintf("/p/%s", homePage), http.StatusFound)
 }
 
 func readPage(p string) (string, error) {
@@ -86,7 +86,7 @@ func setPage(w http.ResponseWriter, r *http.Request) {
 	_, err = f.WriteString(content)
 	check(err)
 	f.Sync()
-	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), 303)
+	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
 }
 
 func main() {
