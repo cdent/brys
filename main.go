@@ -92,6 +92,7 @@ func setPage(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
+	r.Use(middleware.Recoverer)
 	r.Use(middleware.Logger)
 
 	r.Route("/p", func(r chi.Router) {
