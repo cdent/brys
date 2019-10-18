@@ -1,5 +1,5 @@
 
-.PHONY: help gabbi cleangabbi deps
+.PHONY: help gabbi cleangabbi deps gotest
 
 help:
 	@echo "gabbi: run the gabbi tests"
@@ -16,6 +16,11 @@ gabbi: brys
 	.gabbi/bin/gabbi-run -r gabbihtml.handler:HTMLHandler http://localhost:3333 -- gabbits/*.yaml
 	[ -e .brys.pid ] && kill -TERM $$(cat .brys.pid) || true
 	rm .brys.pid || true
+
+test: gotest gabbi
+
+gotest:
+	go test
 
 
 cleangabbi:

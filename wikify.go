@@ -1,17 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 )
 
-// Simple WikiWord, for now
-var wikiWord = regexp.MustCompile(`\b\p{Lu}\p{Ll}+\p{Lu}\p{Ll}+\b`)
-
-func linkify(w string) string {
-	return fmt.Sprintf("<a class=\"wikiword\" href=\"/p/%s\">%s</a>", w, w)
-}
+// Simple WikiWord, for now, we can't use \b because of unicode
+// and golang \b is ascii only (which is fair)
+var wikiWord = regexp.MustCompile(`(\A|\s)(\p{Lu}\p{Ll}+\p{Lu}\p{Ll}+)(\p{P}|\s|\z)`)
 
 func wikify(c string) string {
-	return wikiWord.ReplaceAllStringFunc(c, linkify)
+	return wikiWord.ReplaceAllString(c, "$1<a class=\"wikiword\" href=\"/p/$2\">$2</a>$3")
 }

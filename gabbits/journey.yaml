@@ -39,3 +39,32 @@ tests:
       form@id: editor
       title: CleanPlate
       textarea: This is MyContent
+
+- name: get empty utf8
+  GET: /p/☃
+  response_html:
+      h1: ☃
+      form@id: editor
+      title: ☃
+
+- name: write utf8 page
+  POST: /p/☃
+  request_headers:
+      content-type: application/x-www-form-urlencoded
+  data:
+      content: This is АppleЯow
+  status: 303
+  response_headers:
+      location: /p/%e2%98%83
+
+- name: get utf8 page
+  GET: $LOCATION
+  response_html:
+      h1 > a: ☃
+      h1 > a@href: /p/%e2%98%83?edit=edit
+      pre: This is
+      pre > a: АppleЯow
+      pre > a@href: /p/АppleЯow
+      pre > a@class: wikiword
+  response_strings:
+      - <a class="wikiword" href="/p/АppleЯow">АppleЯow</a>
