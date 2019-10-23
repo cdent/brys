@@ -5,6 +5,3 @@ tests:
   status: 302
   response_headers:
       location: /p/HomePage
-  poll:
-      delay: .01
-      count: 8
