@@ -1,8 +1,8 @@
 package main
 
 import (
-    "os"
 	"io/ioutil"
+	"os"
 )
 
 type Page struct {
@@ -37,4 +37,3 @@ func (p *Page) save(store string) error {
 	}
 	return nil
 }
-

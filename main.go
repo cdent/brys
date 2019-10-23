@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-    "net/url"
+	"net/url"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -64,8 +64,8 @@ func sendWikiPage(w http.ResponseWriter, page *Page) {
 
 func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
-    pageId, err := url.QueryUnescape(pageId)
-    check(err)
+	pageId, err := url.QueryUnescape(pageId)
+	check(err)
 	edit := r.FormValue("edit")
 	page, _ := readPage(store, pageId)
 	if page == nil {
@@ -81,8 +81,8 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 
 func setPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
-    pageId, err := url.QueryUnescape(pageId)
-    check(err)
+	pageId, err := url.QueryUnescape(pageId)
+	check(err)
 	content := r.PostFormValue("content")
 	page := &Page{PageId: pageId, Content: content}
 	err = page.save(store)
