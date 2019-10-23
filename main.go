@@ -15,9 +15,9 @@ import (
 )
 
 var (
-	homePage = "HomePage"
-	store    = "./store"
-	box      = packr.New("assets", "./assets")
+	homePage  = "HomePage"
+	pageStore = "./store"
+	box       = packr.New("assets", "./assets")
 )
 
 // FIXME: this should result in http errors, not fatal exits
@@ -70,8 +70,9 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 	check(err)
 	edit := r.FormValue("edit")
 
-	page := &Page{PageId: pageId}
-	err = page.read(store)
+	s := &store{base: pageStore}
+	page := &Page{PageId: pageId, Store: s}
+	err = page.read()
 
 	// If we tried to get the page and it is not there, create
 	// a new one in the editor.
@@ -93,8 +94,9 @@ func setPage(w http.ResponseWriter, r *http.Request) {
 	pageId, err := url.QueryUnescape(pageId)
 	check(err)
 	content := r.PostFormValue("content")
-	page := &Page{PageId: pageId, Content: content}
-	err = page.save(store)
+	s := &store{base: pageStore}
+	page := &Page{PageId: pageId, Content: content, Store: s}
+	err = page.save()
 	check(err)
 	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
 }
