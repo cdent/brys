@@ -26,7 +26,7 @@ func readPage(store string, p string) (*Page, error) {
 // FIXME: consider having store as an attribute on the Page, so pages could
 // be in different places.
 func (p *Page) save(store string) error {
-	f, err := os.Create(store + "/" + p.PageId)
+	f, err := os.Create(p.storeLoc(store))
 	if err != nil {
 		return err
 	}
@@ -36,4 +36,10 @@ func (p *Page) save(store string) error {
 		return err
 	}
 	return nil
+}
+
+// FIXME: consider having store as an attribute on the Page, so pages could
+// be in different places/stores.
+func (p *Page) storeLoc(store string) string {
+	return store + "/" + p.PageId
 }
