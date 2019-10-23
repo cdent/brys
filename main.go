@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -67,11 +69,18 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId, err := url.QueryUnescape(pageId)
 	check(err)
 	edit := r.FormValue("edit")
-	page, _ := readPage(store, pageId)
-	if page == nil {
-		page = &Page{PageId: pageId, Content: ""}
+
+	page := &Page{PageId: pageId}
+	err = page.read(store)
+
+	// If we tried to get the page and it is not there, create
+	// a new one in the editor.
+	if errors.Is(err, os.ErrNotExist) {
 		edit = "edit"
+	} else {
+		check(err)
 	}
+
 	if edit == "edit" {
 		sendEditor(w, page)
 	} else {

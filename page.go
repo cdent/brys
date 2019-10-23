@@ -12,14 +12,15 @@ type Page struct {
 
 // Read a page from disk. `store` is the directory where wiki pages
 // are stored.
-func readPage(store string, p string) (*Page, error) {
-	content, err := ioutil.ReadFile(store + "/" + p)
+func (p *Page) read(store string) error {
+	content, err := ioutil.ReadFile(p.storeLoc(store))
 	if err != nil {
 		// FIXME: if the err is not found we should return here. If it is
 		// something weird, we should do something about that...
-		return nil, err
+		return err
 	}
-	return &Page{PageId: p, Content: string(content)}, nil
+	p.Content = string(content)
+	return nil
 }
 
 // Write a page to the store.
