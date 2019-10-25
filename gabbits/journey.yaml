@@ -81,3 +81,9 @@ tests:
       h1: ☃
       form@id: editor
       title: ☃
+
+- name: delete via post
+  POST: /p/CleanPlate?delete=delete
+  status: 303
+  response_headers:
+      location: /p/CleanPlate

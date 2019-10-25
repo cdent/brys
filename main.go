@@ -94,20 +94,23 @@ func setPage(w http.ResponseWriter, r *http.Request) {
 	pageId, err := url.QueryUnescape(pageId)
 	check(err)
 	content := r.PostFormValue("content")
-	s := &store{base: pageStore}
-	page := &Page{PageId: pageId, Content: content, Store: s}
-	err = page.save()
-	check(err)
-	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
+	del := r.PostFormValue("delete")
+	if del != "" {
+		delPage(w, r)
+	} else {
+		s := &store{base: pageStore}
+		page := &Page{PageId: pageId, Content: content, Store: s}
+		err = page.save()
+		check(err)
+		http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
+	}
 }
 
 func delPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
-	pageId, err := url.QueryUnescape(pageId)
-	check(err)
 	s := &store{base: pageStore}
 	page := &Page{PageId: pageId, Store: s}
-	err = page.del()
+	err := page.del()
 	check(err)
 	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
 }
