@@ -101,6 +101,17 @@ func setPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
 }
 
+func delPage(w http.ResponseWriter, r *http.Request) {
+	pageId := chi.URLParam(r, "pageId")
+	pageId, err := url.QueryUnescape(pageId)
+	check(err)
+	s := &store{base: pageStore}
+	page := &Page{PageId: pageId, Store: s}
+	err = page.del()
+	check(err)
+	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
+}
+
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -110,6 +121,7 @@ func main() {
 	r.Route("/p", func(r chi.Router) {
 		r.Get("/{pageId}", getPage)
 		r.Post("/{pageId}", setPage)
+		r.Delete("/{pageId}", delPage)
 	})
 	r.Get("/", getRoot)
 

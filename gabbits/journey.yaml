@@ -68,3 +68,16 @@ tests:
       pre > a@class: wikiword
   response_strings:
       - <a class="wikiword" href="/p/АppleЯow">АppleЯow</a>
+
+- name: delete that page
+  DELETE: $URL
+  status: 303
+  response_headers:
+      location: $URL
+
+- name: get deleted page
+  GET: $LOCATION
+  response_html:
+      h1: ☃
+      form@id: editor
+      title: ☃

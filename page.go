@@ -54,6 +54,13 @@ func (p *Page) save() error {
 	return nil
 }
 
+func (p *Page) del() error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	err := os.Remove(p.storeLoc())
+	return err
+}
+
 // FIXME: consider having store as an attribute on the Page, so pages could
 // be in different places/stores.
 func (p *Page) storeLoc() string {
