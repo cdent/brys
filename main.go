@@ -71,7 +71,7 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 	edit := r.FormValue("edit")
 
 	s := &store{base: pageStore}
-	page := &Page{PageId: pageId, Store: s}
+	page := NewPage(pageId, s)
 	err = page.read()
 
 	// If we tried to get the page and it is not there, create
@@ -99,7 +99,8 @@ func setPage(w http.ResponseWriter, r *http.Request) {
 		delPage(w, r)
 	} else {
 		s := &store{base: pageStore}
-		page := &Page{PageId: pageId, Content: content, Store: s}
+		page := NewPage(pageId, s)
+		page.Content = content
 		err = page.save()
 		check(err)
 		http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
@@ -109,7 +110,7 @@ func setPage(w http.ResponseWriter, r *http.Request) {
 func delPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
 	s := &store{base: pageStore}
-	page := &Page{PageId: pageId, Store: s}
+	page := NewPage(pageId, s)
 	err := page.del()
 	check(err)
 	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
