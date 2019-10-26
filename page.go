@@ -30,14 +30,7 @@ func NewPage(title string, s *store) *Page {
 
 // Read a page from disk.
 func (p *Page) read() error {
-	pageLockMutex.Lock()
-	locker, ok := pageLocks[p.PageId]
-	if !ok {
-		locker = &sync.RWMutex{}
-		pageLocks[p.PageId] = locker
-	}
-	locker.RLock()
-	pageLockMutex.Unlock()
+	locker := p.readLock()
 	defer locker.RUnlock()
 	content, err := ioutil.ReadFile(p.storeLoc())
 	if err != nil {
@@ -53,14 +46,7 @@ func (p *Page) read() error {
 // FIXME: consider having store as an attribute on the Page, so pages could
 // be in different places.
 func (p *Page) save() error {
-	pageLockMutex.Lock()
-	locker, ok := pageLocks[p.PageId]
-	if !ok {
-		locker = &sync.RWMutex{}
-		pageLocks[p.PageId] = locker
-	}
-	locker.Lock()
-	pageLockMutex.Unlock()
+	locker := p.writeLock()
 	defer locker.Unlock()
 	f, err := os.Create(p.storeLoc())
 	if err != nil {
@@ -75,6 +61,13 @@ func (p *Page) save() error {
 }
 
 func (p *Page) del() error {
+	locker := p.writeLock()
+	defer locker.Unlock()
+	err := os.Remove(p.storeLoc())
+	return err
+}
+
+func (p *Page) writeLock() *sync.RWMutex {
 	pageLockMutex.Lock()
 	locker, ok := pageLocks[p.PageId]
 	if !ok {
@@ -83,9 +76,19 @@ func (p *Page) del() error {
 	}
 	locker.Lock()
 	pageLockMutex.Unlock()
-	defer locker.Unlock()
-	err := os.Remove(p.storeLoc())
-	return err
+	return locker
+}
+
+func (p *Page) readLock() *sync.RWMutex {
+	pageLockMutex.Lock()
+	locker, ok := pageLocks[p.PageId]
+	if !ok {
+		locker = &sync.RWMutex{}
+		pageLocks[p.PageId] = locker
+	}
+	locker.RLock()
+	pageLockMutex.Unlock()
+	return locker
 }
 
 // FIXME: consider having store as an attribute on the Page, so pages could
