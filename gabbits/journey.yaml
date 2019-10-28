@@ -29,6 +29,8 @@ tests:
       pre > a: MyContent
       pre > a@href: /p/MyContent
       pre > a@class: wikiword
+  response_headers:
+      last-modified: /GMT$/
   response_strings:
       - <a class="wikiword" href="/p/MyContent">MyContent</a>
 

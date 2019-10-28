@@ -1,8 +1,9 @@
 {{define "title"}}{{.PageId}}{{end}}
 {{define "body"}}
 <h1><a title="edit" href="/p/{{.PageId}}?edit=edit">{{.PageId}}</a></h1>
+<p class="modified">Last Modified: {{.Modifiedtime.Format "Jan 02, 2006 15:04"}}</p>
 <pre>
-{{.Content}}
+{{.HTML}}
 </pre>
 <form action="/p/{{.PageId}}" method="POST"><input type="submit" name="delete" value="delete"></form>
 {{end}}

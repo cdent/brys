@@ -53,15 +53,11 @@ func sendWikiPage(w http.ResponseWriter, page *Page) {
 	check(err)
 	et, err := bt.Parse(e)
 	check(err)
-	data := struct {
-		PageId  string
-		Content template.HTML
-	}{
-		page.PageId,
-		// FIXME: This allows anything HTML in the wikification to pass through
-		template.HTML(wikify(page.Content)),
+	page.HTML = template.HTML(wikify(page.Content))
+	if !page.Modifiedtime.IsZero() {
+		w.Header().Set("Last-Modified", page.Modifiedtime.UTC().Format(http.TimeFormat))
 	}
-	et.Execute(w, data)
+	et.Execute(w, page)
 }
 
 func getPage(w http.ResponseWriter, r *http.Request) {

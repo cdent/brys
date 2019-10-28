@@ -1,9 +1,11 @@
 package main
 
 import (
+	"html/template"
 	"io/ioutil"
 	"os"
 	"sync"
+	"time"
 )
 
 var pageLockMutex sync.Mutex
@@ -12,9 +14,11 @@ var pageLockMutex sync.Mutex
 var pageLocks = make(map[string]*sync.RWMutex)
 
 type Page struct {
-	PageId  string
-	Content string
-	Store   *store
+	PageId       string
+	Content      string
+	HTML         template.HTML
+	Modifiedtime time.Time
+	Store        *store
 }
 
 // FIXME: This will become more intereting with time,
@@ -39,6 +43,11 @@ func (p *Page) read() error {
 		return err
 	}
 	p.Content = string(content)
+	file, err := os.Stat(p.storeLoc())
+	// Ignore err if there is one.
+	if err == nil {
+		p.Modifiedtime = file.ModTime()
+	}
 	return nil
 }
 
