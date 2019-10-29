@@ -6,6 +6,7 @@ help:
 	@echo "cleangabbi: remove gabbit virt env"
 
 gabbi: brys
+	packr2 clean
 	rm -r store || true
 	mkdir store
 	[ -e .brys.pid ] && kill -TERM $$(cat .brys.pid) || true
