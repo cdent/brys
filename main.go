@@ -72,7 +72,9 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendRecentChanges(w http.ResponseWriter, r *http.Request) {
-	pages := listPages()
+	s := &store{base: pageStore}
+	pages, err := listPages(s)
+	check(err)
 	// this next block seems like there's probably a shortcut that
 	// could exist
 	b, err := box.FindString("templates/base.html")

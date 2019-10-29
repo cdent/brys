@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"sort"
 	"sync"
 	"time"
 )
@@ -32,10 +33,27 @@ func NewPage(title string, s *store) *Page {
 	return page
 }
 
-func listPages() []Page {
-	nilStore := &store{base: ""}
-	page := Page{PageId: "HomePage", Content: "", Store: nilStore}
-	return []Page{page}
+// FIXME: This currently only works with a unified store.
+func listPages(s *store) ([]*Page, error) {
+	var pages []*Page
+	files, err := ioutil.ReadDir(s.base)
+	if err != nil {
+		// FIXME: This should actually do something...
+		return pages, err
+	}
+	sort.Slice(files, func(i, j int) bool {
+		return files[j].ModTime().Before(files[i].ModTime())
+	})
+	for _, file := range files {
+		page := NewPage(file.Name(), s)
+		err = page.read()
+		// ignore page if there was an error, it probably
+		// got deleted
+		if err == nil {
+			pages = append(pages, page)
+		}
+	}
+	return pages, nil
 }
 
 // Read a page from disk.
