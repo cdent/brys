@@ -46,12 +46,8 @@ func listPages(s *store) ([]*Page, error) {
 	})
 	for _, file := range files {
 		page := NewPage(file.Name(), s)
-		err = page.read()
-		// ignore page if there was an error, it probably
-		// got deleted
-		if err == nil {
-			pages = append(pages, page)
-		}
+		page.Modifiedtime = file.ModTime()
+		pages = append(pages, page)
 	}
 	return pages, nil
 }

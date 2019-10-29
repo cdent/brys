@@ -85,7 +85,21 @@ tests:
       title: ☃
 
 - name: delete via post
-  POST: /p/CleanPlate?delete=delete
+  POST: /p/CleanPlate
+  request_headers:
+      content-type: application/x-www-form-urlencoded
+  data:
+      delete: delete
+  status: 303
+  response_headers:
+      location: /p/CleanPlate
+
+- name: put page back
+  POST: /p/CleanPlate
+  request_headers:
+      content-type: application/x-www-form-urlencoded
+  data:
+      content: This is MyContent
   status: 303
   response_headers:
       location: /p/CleanPlate
@@ -93,4 +107,4 @@ tests:
 - name: view recent changes
   GET: /p/RecentChanges
   response_strings:
-      - <li><a href=
+      - <a href="/p/CleanPlate">CleanPlate
