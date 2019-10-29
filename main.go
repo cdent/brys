@@ -134,7 +134,7 @@ func delPage(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(pageId, s)
 	err := page.del()
 	check(err)
-	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
+	http.Redirect(w, r, "/p/HomePage", http.StatusSeeOther)
 }
 
 func main() {

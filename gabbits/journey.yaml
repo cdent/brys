@@ -77,10 +77,10 @@ tests:
   DELETE: $URL
   status: 303
   response_headers:
-      location: $URL
+      location: /p/HomePage
 
 - name: get deleted page
-  GET: $LOCATION
+  GET: $URL
   response_html:
       h1: ☃
       form@id: editor
@@ -94,7 +94,7 @@ tests:
       delete: delete
   status: 303
   response_headers:
-      location: /p/CleanPlate
+      location: /p/HomePage
 
 - name: put page back
   POST: /p/CleanPlate
