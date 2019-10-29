@@ -1,0 +1,8 @@
+{{define "title"}}Recent Changes{{end}}
+{{define "body"}}
+<ul>
+{{range $val := .}}
+<li>{{$val.Modifiedtime.Format "Jan 02, 2006 15:04"}} <a href="/p/{{$val.PageId}}">{{$val.PageId}}</a></li>
+{{end}}
+</ul>
+{{end}}

@@ -64,11 +64,36 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
 	pageId, err := url.QueryUnescape(pageId)
 	check(err)
+	if pageId == "RecentChanges" {
+		sendRecentChanges(w, r)
+	} else {
+		sendRegularPage(w, r, pageId)
+	}
+}
+
+func sendRecentChanges(w http.ResponseWriter, r *http.Request) {
+	s := &store{base: pageStore}
+	pages, err := listPages(s)
+	check(err)
+	// this next block seems like there's probably a shortcut that
+	// could exist
+	b, err := box.FindString("templates/base.html")
+	check(err)
+	e, err := box.FindString("templates/recents.html")
+	check(err)
+	bt, err := template.New("page").Parse(b)
+	check(err)
+	et, err := bt.Parse(e)
+	check(err)
+	et.Execute(w, pages)
+}
+
+func sendRegularPage(w http.ResponseWriter, r *http.Request, pageId string) {
 	edit := r.FormValue("edit")
 
 	s := &store{base: pageStore}
 	page := NewPage(pageId, s)
-	err = page.read()
+	err := page.read()
 
 	// If we tried to get the page and it is not there, create
 	// a new one in the editor.
@@ -109,7 +134,7 @@ func delPage(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(pageId, s)
 	err := page.del()
 	check(err)
-	http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
+	http.Redirect(w, r, "/p/HomePage", http.StatusSeeOther)
 }
 
 func main() {

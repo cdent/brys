@@ -6,6 +6,7 @@ help:
 	@echo "cleangabbi: remove gabbit virt env"
 
 gabbi: brys
+	packr2 clean
 	rm -r store || true
 	mkdir store
 	[ -e .brys.pid ] && kill -TERM $$(cat .brys.pid) || true
@@ -26,6 +27,7 @@ cleangabbi:
 	rm -rf .gabbi
 
 deps:
+	go get github.com/gobuffalo/packr/v2/packr2
 	go get ./...
 
 brys: deps ${GOBIN}/brys

@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"sort"
 	"sync"
 	"time"
 )
@@ -30,6 +31,25 @@ type store struct {
 func NewPage(title string, s *store) *Page {
 	page := &Page{PageId: title, Content: "", Store: s}
 	return page
+}
+
+// FIXME: This currently only works with a unified store.
+func listPages(s *store) ([]*Page, error) {
+	var pages []*Page
+	files, err := ioutil.ReadDir(s.base)
+	if err != nil {
+		// FIXME: This should actually do something...
+		return pages, err
+	}
+	sort.Slice(files, func(i, j int) bool {
+		return files[j].ModTime().Before(files[i].ModTime())
+	})
+	for _, file := range files {
+		page := NewPage(file.Name(), s)
+		page.Modifiedtime = file.ModTime()
+		pages = append(pages, page)
+	}
+	return pages, nil
 }
 
 // Read a page from disk.

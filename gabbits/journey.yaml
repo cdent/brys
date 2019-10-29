@@ -29,6 +29,8 @@ tests:
       pre > a: MyContent
       pre > a@href: /p/MyContent
       pre > a@class: wikiword
+      h3 > a: RecentChanges
+      h3 > a@href: /p/RecentChanges
   response_headers:
       last-modified: /GMT$/
   response_strings:
@@ -75,17 +77,36 @@ tests:
   DELETE: $URL
   status: 303
   response_headers:
-      location: $URL
+      location: /p/HomePage
 
 - name: get deleted page
-  GET: $LOCATION
+  GET: $URL
   response_html:
       h1: ☃
       form@id: editor
       title: ☃
 
 - name: delete via post
-  POST: /p/CleanPlate?delete=delete
+  POST: /p/CleanPlate
+  request_headers:
+      content-type: application/x-www-form-urlencoded
+  data:
+      delete: delete
+  status: 303
+  response_headers:
+      location: /p/HomePage
+
+- name: put page back
+  POST: /p/CleanPlate
+  request_headers:
+      content-type: application/x-www-form-urlencoded
+  data:
+      content: This is MyContent
   status: 303
   response_headers:
       location: /p/CleanPlate
+
+- name: view recent changes
+  GET: /p/RecentChanges
+  response_strings:
+      - <a href="/p/CleanPlate">CleanPlate
