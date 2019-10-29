@@ -27,6 +27,7 @@ cleangabbi:
 	rm -rf .gabbi
 
 deps:
+	go get github.com/gobuffalo/packr/v2/packr2
 	go get ./...
 
 brys: deps ${GOBIN}/brys
