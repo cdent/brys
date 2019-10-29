@@ -1,0 +1,8 @@
+{{define "title"}}Recent Changes{{end}}
+{{define "body"}}
+<ul>
+{{range $val := .}}
+<li><a href="/p/{{$val.PageId}}">{{$val.PageId}}</a></li>
+{{end}}
+</ul>
+{{end}}

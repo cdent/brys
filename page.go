@@ -32,6 +32,12 @@ func NewPage(title string, s *store) *Page {
 	return page
 }
 
+func listPages() []Page {
+	nilStore := &store{base: ""}
+	page := Page{PageId: "HomePage", Content: "", Store: nilStore}
+	return []Page{page}
+}
+
 // Read a page from disk.
 func (p *Page) read() error {
 	locker := p.readLock()

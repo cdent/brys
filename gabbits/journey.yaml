@@ -89,3 +89,8 @@ tests:
   status: 303
   response_headers:
       location: /p/CleanPlate
+
+- name: view recent changes
+  GET: /p/RecentChanges
+  response_strings:
+      - <li><a href=
