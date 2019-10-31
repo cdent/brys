@@ -141,12 +141,6 @@ func delPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/p/HomePage", http.StatusSeeOther)
 }
 
-func notifyRc(c chan string) {
-	for message := range c {
-		log.Printf("Got %s", message)
-	}
-}
-
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -155,8 +149,7 @@ func main() {
 
 	rcChan := make(chan string)
 
-	go notifyRc(rcChan)
-
+	r.HandleFunc("/ws", serveWs(rcChan))
 	r.Route("/p", func(r chi.Router) {
 		r.Get("/{pageId}", getPage)
 		r.Post("/{pageId}", setPage(rcChan))
