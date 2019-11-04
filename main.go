@@ -110,22 +110,26 @@ func sendRegularPage(w http.ResponseWriter, r *http.Request, pageId string) {
 	}
 }
 
-func setPage(w http.ResponseWriter, r *http.Request) {
-	pageId := chi.URLParam(r, "pageId")
-	pageId, err := url.QueryUnescape(pageId)
-	check(err)
-	content := r.PostFormValue("content")
-	del := r.PostFormValue("delete")
-	if del != "" {
-		delPage(w, r)
-	} else {
-		s := &store{base: pageStore}
-		page := NewPage(pageId, s)
-		page.Content = content
-		err = page.save()
+func setPage(c chan []byte) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pageId := chi.URLParam(r, "pageId")
+		pageId, err := url.QueryUnescape(pageId)
 		check(err)
-		http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
-	}
+		content := r.PostFormValue("content")
+		del := r.PostFormValue("delete")
+		if del != "" {
+			delPage(w, r)
+		} else {
+			s := &store{base: pageStore}
+			page := NewPage(pageId, s)
+			page.Content = content
+			err = page.save()
+			check(err)
+			// Send a notification this page.
+			c <- []byte(pageId)
+			http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
+		}
+	})
 }
 
 func delPage(w http.ResponseWriter, r *http.Request) {
@@ -143,9 +147,13 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Logger)
 
+	hub := newHub()
+	go hub.run()
+
+	r.HandleFunc("/ws", serveWs(hub))
 	r.Route("/p", func(r chi.Router) {
 		r.Get("/{pageId}", getPage)
-		r.Post("/{pageId}", setPage)
+		r.Post("/{pageId}", setPage(hub.broadcast))
 		r.Delete("/{pageId}", delPage)
 	})
 	r.Get("/", getRoot)
