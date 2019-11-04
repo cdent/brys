@@ -110,7 +110,7 @@ func sendRegularPage(w http.ResponseWriter, r *http.Request, pageId string) {
 	}
 }
 
-func setPage(c chan string) http.HandlerFunc {
+func setPage(c chan []byte) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pageId := chi.URLParam(r, "pageId")
 		pageId, err := url.QueryUnescape(pageId)
@@ -126,7 +126,7 @@ func setPage(c chan string) http.HandlerFunc {
 			err = page.save()
 			check(err)
 			// Send a notification this page.
-			c <- pageId
+			c <- []byte(pageId)
 			http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
 		}
 	})
@@ -147,12 +147,13 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Logger)
 
-	rcChan := make(chan string)
+	hub := newHub()
+	go hub.run()
 
-	r.HandleFunc("/ws", serveWs(rcChan))
+	r.HandleFunc("/ws", serveWs(hub))
 	r.Route("/p", func(r chi.Router) {
 		r.Get("/{pageId}", getPage)
-		r.Post("/{pageId}", setPage(rcChan))
+		r.Post("/{pageId}", setPage(hub.broadcast))
 		r.Delete("/{pageId}", delPage)
 	})
 	r.Get("/", getRoot)

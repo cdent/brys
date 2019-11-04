@@ -25,10 +25,10 @@ tests:
   response_html:
       h1 > a: CleanPlate
       h1 > a@href: /p/CleanPlate?edit=edit
-      pre: This is
-      pre > a: MyContent
-      pre > a@href: /p/MyContent
-      pre > a@class: wikiword
+      "pre:nth-of-type(1)": This is
+      "pre:nth-of-type(1) > a": MyContent
+      "pre:nth-of-type(1) > a@href": /p/MyContent
+      "pre:nth-of-type(1) > a@class": wikiword
       h3 > a: RecentChanges
       h3 > a@href: /p/RecentChanges
   response_headers:
@@ -66,10 +66,8 @@ tests:
   response_html:
       h1 > a: ☃
       h1 > a@href: /p/%e2%98%83?edit=edit
-      pre: This is
-      pre > a: АppleЯow
-      pre > a@href: /p/АppleЯow
-      pre > a@class: wikiword
+      "pre:nth-of-type(1)": This is
+      "pre:nth-of-type(1) > a": АppleЯow
   response_strings:
       - <a class="wikiword" href="/p/АppleЯow">АppleЯow</a>
 
