@@ -10,3 +10,11 @@ tests:
   data:
       content: This is MyContent
   status: 415
+
+- name: send wrong method
+  PUT: /p/CleanPlate2
+  request_headers:
+      content-type: application/x-www-form-urlencoded
+  data:
+      content: This is MyContent
+  status: 405
