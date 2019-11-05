@@ -146,6 +146,8 @@ func main() {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Logger)
+	// Restrict request bodies to forms (for now)
+	r.Use(middleware.AllowContentType("application/x-www-form-urlencoded"))
 
 	hub := newHub()
 	go hub.run()

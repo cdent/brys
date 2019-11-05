@@ -1,0 +1,12 @@
+# Explore various error conditions
+
+
+tests:
+
+- name: send wrong content type
+  POST: /p/CleanPlate2
+  request_headers:
+      content-type: application/json
+  data:
+      content: This is MyContent
+  status: 415
