@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -20,10 +19,11 @@ var (
 	box       = packr.New("assets", "./assets")
 )
 
-// FIXME: this should result in http errors, not fatal exits
+// FIXME: this should result in http errors that are dependent on what
+// happened, not 500s
 func check(err error) {
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
