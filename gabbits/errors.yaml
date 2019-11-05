@@ -18,3 +18,19 @@ tests:
   data:
       content: This is MyContent
   status: 405
+
+- name: get bad encoding
+  GET: /p/Clean%Hello
+  status: 400
+  response_strings:
+      - 'invalid URL escape "%He"'
+
+- name: post bad encoding
+  POST: /p/Clean%Hello
+  request_headers:
+      content-type: application/x-www-form-urlencoded
+  data:
+      content: This is MyContent
+  status: 400
+  response_strings:
+      - 'invalid URL escape "%He"'

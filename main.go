@@ -63,7 +63,10 @@ func sendWikiPage(w http.ResponseWriter, page *Page) {
 func getPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
 	pageId, err := url.QueryUnescape(pageId)
-	check(err)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	if pageId == "RecentChanges" {
 		sendRecentChanges(w, r)
 	} else {
@@ -114,7 +117,10 @@ func setPage(c chan []byte) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pageId := chi.URLParam(r, "pageId")
 		pageId, err := url.QueryUnescape(pageId)
-		check(err)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		content := r.PostFormValue("content")
 		del := r.PostFormValue("delete")
 		if del != "" {
