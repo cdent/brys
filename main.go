@@ -2,8 +2,10 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -14,8 +16,9 @@ import (
 )
 
 var (
-	homePage  = "HomePage"
-	pageStore = "./store"
+	homePage  = flag.String("homepage", "HomePage", "1st Page of wiki")
+	pageStore = flag.String("store", "./store", "Path to data storage")
+	port      = flag.String("port", "3333", "Port to listen on")
 	box       = packr.New("assets", "./assets")
 )
 
@@ -29,7 +32,7 @@ func check(err error) {
 
 // Go to the HomePage when / is requested.
 func getRoot(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, fmt.Sprintf("/p/%s", homePage), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf("/p/%s", *homePage), http.StatusFound)
 }
 
 func sendEditor(w http.ResponseWriter, page *Page) {
@@ -75,7 +78,7 @@ func getPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendRecentChanges(w http.ResponseWriter, r *http.Request) {
-	s := &store{base: pageStore}
+	s := &store{base: *pageStore}
 	pages, err := listPages(s)
 	check(err)
 	// this next block seems like there's probably a shortcut that
@@ -94,7 +97,7 @@ func sendRecentChanges(w http.ResponseWriter, r *http.Request) {
 func sendRegularPage(w http.ResponseWriter, r *http.Request, pageId string) {
 	edit := r.FormValue("edit")
 
-	s := &store{base: pageStore}
+	s := &store{base: *pageStore}
 	page := NewPage(pageId, s)
 	err := page.read()
 
@@ -126,7 +129,7 @@ func setPage(c chan []byte) http.HandlerFunc {
 		if del != "" {
 			delPage(w, r)
 		} else {
-			s := &store{base: pageStore}
+			s := &store{base: *pageStore}
 			page := NewPage(pageId, s)
 			page.Content = content
 			err = page.save()
@@ -140,7 +143,7 @@ func setPage(c chan []byte) http.HandlerFunc {
 
 func delPage(w http.ResponseWriter, r *http.Request) {
 	pageId := chi.URLParam(r, "pageId")
-	s := &store{base: pageStore}
+	s := &store{base: *pageStore}
 	page := NewPage(pageId, s)
 	err := page.del()
 	check(err)
@@ -148,6 +151,7 @@ func delPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	flag.Parse()
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Recoverer)
@@ -166,5 +170,5 @@ func main() {
 	})
 	r.Get("/", getRoot)
 
-	http.ListenAndServe(":3333", r)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *port), r))
 }

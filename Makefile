@@ -30,5 +30,5 @@ deps:
 	go get github.com/gobuffalo/packr/v2/packr2
 	go get ./...
 
-brys: deps main.go
+brys: deps *.go
 	go build
