@@ -11,7 +11,7 @@
 <script type="text/javascript">
     (function() {
         var data = document.getElementById("rc");
-        var conn = new WebSocket("ws://localhost:3333/ws");
+        var conn = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/ws");
         conn.onclose = function(evt) {
             data.textContent = 'Connection closed';
         }
