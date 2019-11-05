@@ -11,7 +11,7 @@ gabbi: brys
 	mkdir store
 	[ -e .brys.pid ] && kill -TERM $$(cat .brys.pid) || true
 	rm .brys.pid || true
-	brys & echo "$$!" > .brys.pid
+	./brys & echo "$$!" > .brys.pid
 	[ -d .gabbi ] || python3 -mvenv .gabbi
 	[ -x .gabbi/bin/gabbi-run ] || .gabbi/bin/pip install gabbi git+https://github.com/cdent/gabbihtml.git#egg=gabbihtml
 	sleep 2 && .gabbi/bin/gabbi-run -r gabbihtml.handler:HTMLHandler http://localhost:3333 -- gabbits/*.yaml
@@ -30,7 +30,5 @@ deps:
 	go get github.com/gobuffalo/packr/v2/packr2
 	go get ./...
 
-brys: deps ${GOBIN}/brys
-
-${GOBIN}/brys: main.go
-	go install
+brys: deps main.go
+	go build
