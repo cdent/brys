@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"os"
@@ -87,6 +88,18 @@ func (p *Page) save() error {
 		return err
 	}
 	return nil
+}
+
+// A limited Page -> JSON, leaving out everything but Id and mod time.
+// Used by recent changes websocket.
+func (p *Page) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		PageId       string
+		Modifiedtime string
+	}{
+		PageId:       p.PageId,
+		Modifiedtime: p.Modifiedtime.Format("Jan 02, 2006 15:04"),
+	})
 }
 
 func (p *Page) del() error {

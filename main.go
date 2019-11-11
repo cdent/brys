@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -116,7 +117,7 @@ func sendRegularPage(w http.ResponseWriter, r *http.Request, pageId string) {
 	}
 }
 
-func setPage(c chan []byte) http.HandlerFunc {
+func setPage(c chan *Page) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pageId := chi.URLParam(r, "pageId")
 		pageId, err := url.QueryUnescape(pageId)
@@ -134,8 +135,9 @@ func setPage(c chan []byte) http.HandlerFunc {
 			page.Content = content
 			err = page.save()
 			check(err)
-			// Send a notification this page.
-			c <- []byte(pageId)
+			// Send a notification of this page.
+			page.Modifiedtime = time.Now()
+			c <- page
 			http.Redirect(w, r, fmt.Sprintf("/p/%s", pageId), http.StatusSeeOther)
 		}
 	})
