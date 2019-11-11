@@ -7,17 +7,24 @@
 </pre>
 <form action="/p/{{.PageId}}" method="POST"><input type="submit" name="delete" value="delete"></form>
 <h3><a href="/p/RecentChanges">RecentChanges</a></h3>
-<pre id="rc"></pre>
+<ul id="rc"></ul>
 <script type="text/javascript">
     (function() {
         var data = document.getElementById("rc");
         var conn = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/ws");
         conn.onclose = function(evt) {
-            data.textContent = 'Connection closed';
+            var li = document.createElement("li");
+            var content = document.createTextNode("Connection Closed");
+            li.appendChild(content);
+            data.prepend(li);
         }
         conn.onmessage = function(evt) {
-            console.log('file updated');
-            data.textContent += evt.data + "\n";
+            var parsed = JSON.parse(evt.data);
+            console.log('file updated' + parsed.PageId);
+            var li = document.createElement("li");
+            var content = document.createTextNode(parsed.PageId + ": " + parsed.Modifiedtime);
+            li.appendChild(content);
+            data.prepend(li);
         }
     })();
 </script>
